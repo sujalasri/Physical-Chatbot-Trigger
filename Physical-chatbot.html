@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Physical Assistance Chatbot</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef2f7;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            width: 430px;
+            height: 620px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+        }
+
+        .header h2 {
+            margin: 0 0 6px;
+            font-size: 22px;
+        }
+
+        .header p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.8;
+        }
+
+        .status {
+            padding: 10px 20px;
+            background: #f0fdf4;
+            color: #166534;
+            font-size: 13px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 18px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 11px 14px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        .bot {
+            background: #e5e7eb;
+            color: #111827;
+        }
+
+        .user {
+            background: #1f2937;
+            color: white;
+            margin-left: auto;
+        }
+
+        .input-area {
+            display: flex;
+            padding: 14px;
+            border-top: 1px solid #ddd;
+            background: #fafafa;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        button {
+            margin-left: 8px;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            background: #1f2937;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #374151;
+        }
+
+        .assistance {
+            margin: 12px 18px;
+            padding: 12px;
+            border-radius: 10px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h2>Physical Assistance Chatbot</h2>
+        <p>Smart assistance and emergency communication system</p>
+    </div>
+
+    <div class="status">
+        ● System Connected
+    </div>
+
+    <div class="assistance">
+        🔘 Physical assistance button is connected
+    </div>
+
+    <div class="chat-box" id="chatBox">
+
+        <div class="message bot">
+            Hello! How can I help you?
+        </div>
+
+    </div>
+
+    <div class="input-area">
+
+        <input
+            type="text"
+            id="messageInput"
+            placeholder="Type your message..."
+            onkeypress="handleKey(event)"
+        >
+
+        <button onclick="sendMessage()">
+            Send
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const API_URL =
+"https://wavl7mdpwc.execute-api.us-east-1.amazonaws.com/chat";
+
+function addMessage(text, sender) {
+
+    const chatBox = document.getElementById("chatBox");
+
+    const message = document.createElement("div");
+
+    message.className = "message " + sender;
+
+    message.innerText = text;
+
+    chatBox.appendChild(message);
+
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage() {
+
+    const input =
+        document.getElementById("messageInput");
+
+    const message = input.value.trim();
+
+    if (message === "") {
+        return;
+    }
+
+    addMessage(message, "user");
+
+    input.value = "";
+
+    try {
+
+        const response = await fetch(API_URL, {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                message: message
+            })
+
+        });
+
+        const data = await response.json();
+
+        addMessage(data.message, "bot");
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+        addMessage(
+            "Sorry, I couldn't connect to the chatbot.",
+            "bot"
+        );
+    }
+}
+
+function handleKey(event) {
+
+    if (event.key === "Enter") {
+        sendMessage();
+    }
+}
+
+</script>
+
+</body>
+</html>
